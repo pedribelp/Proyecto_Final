@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sistema de Figuras Geométricas Mejorado</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet" />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+  />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #f9fafb;
+    }
+    svg {
+      max-width: 100%;
+      height: auto;
+      transition: transform 0.3s ease;
+    }
+    .card:hover svg {
+      transform: scale(1.1);
+    }
+    .card {
+      transition: box-shadow 0.3s ease;
+    }
+    .card:hover {
+      box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+    }
+    .btn-primary {
+      background-color: #2563eb;
+    }
+    .btn-primary:hover {
+      background-color: #1d4ed8;
+    }
+    .btn-secondary {
+      background-color: #6b7280;
+    }
+    .btn-secondary:hover {
+      background-color: #4b5563;
+    }
+    .btn-success {
+      background-color: #16a34a;
+    }
+    .btn-success:hover {
+      background-color: #15803d;
+    }
+    .btn-warning {
+      background-color: #ca8a04;
+    }
+    .btn-warning:hover {
+      background-color: #a16207;
+    }
+    .btn-info {
+      background-color: #3b82f6;
+    }
+    .btn-info:hover {
+      background-color: #2563eb;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+  <header class="bg-white shadow p-4">
+    <h1 class="text-4xl font-bold text-center text-gray-800">Sistema de Figuras Geométricas</h1>
+  </header>
+
+  <main class="container mx-auto p-6 flex-grow">
+    <section class="mb-6">
+      <form id="ternaForm" class="flex flex-wrap justify-center gap-4 items-center">
+        <input
+          type="number"
+          step="any"
+          id="num1"
+          placeholder="Número 1"
+          required
+          class="border border-gray-300 rounded px-4 py-2 w-28 text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
+          aria-label="Número 1"
+        />
+        <input
+          type="number"
+          step="any"
+          id="num2"
+          placeholder="Número 2"
+          required
+          class="border border-gray-300 rounded px-4 py-2 w-28 text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
+          aria-label="Número 2"
+        />
+        <input
+          type="number"
+          step="any"
+          id="num3"
+          placeholder="Número 3"
+          required
+          class="border border-gray-300 rounded px-4 py-2 w-28 text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
+          aria-label="Número 3"
+        />
+        <button
+          type="submit"
+          class="btn-primary text-white rounded px-6 py-2 shadow hover:shadow-lg transition"
+          aria-label="Agregar Terna"
+        >
+          <i class="fas fa-plus mr-2"></i> Agregar Terna
+        </button>
+      </form>
+    </section>
+
+    <section class="mb-6 flex flex-wrap justify-center gap-4">
+      <button
+        id="sortAreaBtn"
+        class="btn-success text-white rounded px-5 py-2 shadow hover:shadow-lg transition flex items-center gap-2"
+        aria-label="Ordenar figuras por área ascendente"
+      >
+        <i class="fas fa-sort-amount-up"></i> Ordenar por Área
+      </button>
+      <button
+        id="sortPerimeterBtn"
+        class="btn-warning text-white rounded px-5 py-2 shadow hover:shadow-lg transition flex items-center gap-2"
+        aria-label="Ordenar figuras por perímetro descendente"
+      >
+        <i class="fas fa-sort-amount-down"></i> Ordenar por Perímetro
+      </button>
+      <button
+        id="searchAreaBtn"
+        class="btn-info text-white rounded px-5 py-2 shadow hover:shadow-lg transition flex items-center gap-2"
+        aria-label="Buscar figura por área"
+      >
+        <i class="fas fa-search"></i> Buscar por Área
+      </button>
+      <button
+        id="showStatsBtn"
+        class="btn-secondary text-white rounded px-5 py-2 shadow hover:shadow-lg transition flex items-center gap-2"
+        aria-label="Mostrar estadísticas"
+      >
+        <i class="fas fa-chart-bar"></i> Ver Estadísticas
+      </button>
+    </section>
+
+    <div id="message" class="text-center mb-6 text-lg font-semibold text-gray-700" role="alert" aria-live="polite"></div>
+
+    <section id="figurasContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8"></section>
+
+    <section
+      id="searchAreaContainer"
+      class="hidden max-w-md mx-auto bg-white p-6 rounded shadow-md mb-6"
+      aria-label="Buscar figura por área"
+    >
+      <h2 class="text-2xl font-semibold mb-4 text-gray-800">Buscar Figura por Área</h2>
+      <form id="searchAreaForm" class="flex gap-3" role="search">
+        <input
+          type="number"
+          step="any"
+          id="searchAreaInput"
+          placeholder="Área a buscar"
+          required
+          class="flex-grow border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          aria-label="Área a buscar"
+        />
+        <button
+          type="submit"
+          class="btn-info text-white rounded px-5 py-2 shadow hover:shadow-lg transition"
+          aria-label="Buscar"
+        >
+          Buscar
+        </button>
+        <button
+          type="button"
+          id="cancelSearchBtn"
+          class="bg-gray-400 text-white rounded px-5 py-2 shadow hover:shadow-lg transition"
+          aria-label="Cancelar búsqueda"
+        >
+          Cancelar
+        </button>
+      </form>
+      <div id="searchResult" class="mt-4 font-medium text-gray-700" role="status" aria-live="polite"></div>
+    </section>
+
+    <section
+      id="statsContainer"
+      class="hidden max-w-lg mx-auto bg-white p-6 rounded shadow-md"
+      aria-label="Estadísticas de figuras"
+    >
+      <h2 class="text-2xl font-semibold mb-4 text-gray-800">Estadísticas de Figuras</h2>
+      <ul class="list-disc list-inside space-y-2 text-gray-700" id="statsList"></ul>
+      <button
+        id="closeStatsBtn"
+        class="mt-6 bg-gray-400 text-white rounded px-6 py-2 shadow hover:shadow-lg transition"
+        aria-label="Cerrar estadísticas"
+      >
+        Cerrar
+      </button>
+    </section>
+  </main>
+
+  <footer class="bg-gray-800 text-gray-300 text-center py-4">
+    &copy; 2024 Sistema de Figuras Geométricas Mejorado
+  </footer>
+
+  <script>
+    // Geometric figure classes in JS
+
+    class Figura {
+      constructor(tipo) {
+        this.tipo = tipo;
+      }
+      calcular_area() {
+        return 0;
+      }
+      calcular_perimetro() {
+        return 0;
+      }
+    }
+
+    class Cuadrado extends Figura {
+      constructor(lado) {
+        super("Cuadrado");
+        this.lado = lado;
+      }
+      calcular_area() {
+        return this.lado ** 2;
+      }
+      calcular_perimetro() {
+        return 4 * this.lado;
+      }
+    }
+
+    class Circulo extends Figura {
+      constructor(radio) {
+        super("Círculo");
+        this.radio = radio;
+      }
+      calcular_area() {
+        return Math.PI * this.radio ** 2;
+      }
+      calcular_perimetro() {
+        return 2 * Math.PI * this.radio;
+      }
+    }
+
+    class Rectangulo extends Figura {
+      constructor(lado1, lado2) {
+        super("Rectángulo");
+        this.lado1 = lado1;
+        this.lado2 = lado2;
+      }
+      calcular_area() {
+        return this.lado1 * this.lado2;
+      }
+      calcular_perimetro() {
+        return 2 * (this.lado1 + this.lado2);
+      }
+    }
+
+    class Rombo extends Figura {
+      constructor(diagonal1, diagonal2) {
+        super("Rombo");
+        this.diagonal1 = diagonal1;
+        this.diagonal2 = diagonal2;
+        this.lado = Math.sqrt((this.diagonal1 / 2) ** 2 + (this.diagonal2 / 2) ** 2);
+      }
+      calcular_area() {
+        return (this.diagonal1 * this.diagonal2) / 2;
+      }
+      calcular_perimetro() {
+        return 4 * this.lado;
+      }
+    }
+
+    class TrianguloEscaleno extends Figura {
+      constructor(lado1, lado2, lado3) {
+        super("Triángulo Escaleno");
+        if (
+          lado1 + lado2 <= lado3 ||
+          lado1 + lado3 <= lado2 ||
+          lado2 + lado3 <= lado1
+        ) {
+          throw new Error("Lados no forman un triángulo válido");
+        }
+        this.lado1 = lado1;
+        this.lado2 = lado2;
+        this.lado3 = lado3;
+      }
+      calcular_area() {
+        const s = (this.lado1 + this.lado2 + this.lado3) / 2;
+        return Math.sqrt(
+          s * (s - this.lado1) * (s - this.lado2) * (s - this.lado3)
+        );
+      }
+      calcular_perimetro() {
+        return this.lado1 + this.lado2 + this.lado3;
+      }
+    }
+
+    class Trapecio extends Figura {
+      constructor(base_mayor, base_menor, lado1, lado2) {
+        super("Trapecio");
+        this.base_mayor = base_mayor;
+        this.base_menor = base_menor;
+        this.lado1 = lado1;
+        this.lado2 = lado2;
+        const s = (base_mayor - base_menor) / 2;
+        if (s > lado1 || s > lado2) {
+          throw new Error("Lados no forman un trapecio válido");
+        }
+        this.altura = Math.sqrt(lado1 ** 2 - s ** 2);
+      }
+      calcular_area() {
+        return ((this.base_mayor + this.base_menor) / 2) * this.altura;
+      }
+      calcular_perimetro() {
+        return (
+          this.base_mayor + this.base_menor + this.lado1 + this.lado2
+        );
+      }
+    }
+
+    // Bubble sort iterative and recursive
+
+    function bubbleSortIterative(arr, key = (x) => x, reverse = false) {
+      const resultado = arr.slice();
+      const n = resultado.length;
+      for (let i = 0; i < n; i++) {
+        let swapped = false;
+        for (let j = 0; j < n - i - 1; j++) {
+          let condicion = key(resultado[j]) > key(resultado[j + 1]);
+          if (reverse) condicion = !condicion;
+          if (condicion) {
+            [resultado[j], resultado[j + 1]] = [resultado[j + 1], resultado[j]];
+            swapped = true;
+          }
+        }
+        if (!swapped) break;
+      }
+      return resultado;
+    }
+
+    function bubbleSortRecursive(arr, key = (x) => x, reverse = false) {
+      const resultado = arr.slice();
+      function recursiveSort(n) {
+        if (n === 1) return;
+        let swapped = false;
+        for (let i = 0; i < n - 1; i++) {
+          let condicion = key(resultado[i]) > key(resultado[i + 1]);
+          if (reverse) condicion = !condicion;
+          if (condicion) {
+            [resultado[i], resultado[i + 1]] = [resultado[i + 1], resultado[i]];
+            swapped = true;
+          }
+        }
+        if (!swapped) return;
+        recursiveSort(n - 1);
+      }
+      recursiveSort(resultado.length);
+      return resultado;
+    }
+
+    // Process ternas to generate figures
+
+    function procesarTerna(terna) {
+      const ternaOrdenada = [...terna].sort((a, b) => a - b);
+      const figuras = {};
+      if (
+        ternaOrdenada[0] === ternaOrdenada[1] &&
+        ternaOrdenada[1] === ternaOrdenada[2]
+      ) {
+        const lado = ternaOrdenada[0];
+        figuras.cuadrado = new Cuadrado(lado);
+        figuras.circulo = new Circulo(lado);
+      } else if (
+        ternaOrdenada[0] === ternaOrdenada[1] ||
+        ternaOrdenada[1] === ternaOrdenada[2]
+      ) {
+        let ladoIgual, ladoDistinto;
+        if (ternaOrdenada[0] === ternaOrdenada[1]) {
+          ladoIgual = ternaOrdenada[0];
+          ladoDistinto = ternaOrdenada[2];
+        } else {
+          ladoIgual = ternaOrdenada[1];
+          ladoDistinto = ternaOrdenada[0];
+        }
+        figuras.rectangulo = new Rectangulo(ladoIgual, ladoDistinto);
+        figuras.rombo = new Rombo(ladoIgual, ladoDistinto);
+      } else {
+        try {
+          figuras.triangulo = new TrianguloEscaleno(
+            ternaOrdenada[0],
+            ternaOrdenada[1],
+            ternaOrdenada[2]
+          );
+        } catch (e) {
+          // No válido
+        }
+        const baseMayor = Math.max(...terna);
+        const baseMenor = Math.min(...terna);
+        const ladoMedio = terna.reduce((a, b) => a + b, 0) - baseMayor - baseMenor;
+        const delta = (baseMayor - baseMenor) / 2;
+        try {
+          const lado2 = Math.sqrt(ladoMedio ** 2 - delta ** 2);
+          figuras.trapecio = new Trapecio(baseMayor, baseMenor, ladoMedio, lado2);
+        } catch (e) {
+          // No válido
+        }
+      }
+      return figuras;
+    }
+
+    // Global data storage
+
+    let ternas = [];
+    let figuras = [];
+
+    // Add test data on load
+
+    function generarDatosPrueba() {
+      return [
+        [5, 5, 5],
+        [10, 10, 10],
+        [4, 4, 8],
+        [7, 3, 7],
+        [3, 4, 5],
+        [7, 9, 12],
+        [6, 6, 6],
+        [8, 8, 12],
+        [5, 7, 10],
+      ];
+    }
+
+    function agregarTerna(terna) {
+      const figurasTerna = procesarTerna(terna);
+      if (Object.keys(figurasTerna).length > 0) {
+        ternas.push(terna);
+        for (const f of Object.values(figurasTerna)) {
+          figuras.push(f);
+        }
+        return true;
+      }
+      return false;
+    }
+
+    // SVG drawing functions
+
+    function crearSVGCuadrado(lado) {
+      const size = 100;
+      const half = size / 2;
+      return `
+        <svg viewBox="0 0 ${size} ${size}" class="mx-auto" aria-label="Cuadrado" role="img" tabindex="0">
+          <rect x="${half - lado / 2}" y="${half - lado / 2}" width="${lado}" height="${lado}" stroke="blue" fill="none" stroke-width="3"/>
+        </svg>
+      `;
+    }
+
+    function crearSVGCirculo(radio) {
+      const size = 100;
+      const half = size / 2;
+      return `
+        <svg viewBox="0 0 ${size} ${size}" class="mx-auto" aria-label="Círculo" role="img" tabindex="0">
+          <circle cx="${half}" cy="${half}" r="${radio}" stroke="red" fill="none" stroke-width="3"/>
+        </svg>
+      `;
+    }
+
+    function crearSVGRectangulo(lado1, lado2) {
+      const size = 100;
+      const half = size / 2;
+      return `
+        <svg viewBox="0 0 ${size} ${size}" class="mx-auto" aria-label="Rectángulo" role="img" tabindex="0">
+          <rect x="${half - lado1 / 2}" y="${half - lado2 / 2}" width="${lado1}" height="${lado2}" stroke="green" fill="none" stroke-width="3"/>
+        </svg>
+      `;
+    }
+
+    function crearSVGRombo(diagonal1, diagonal2) {
+      const size = 100;
+      const half = size / 2;
+      const points = [
+        [half + diagonal1 / 2, half],
+        [half, half + diagonal2 / 2],
+        [half - diagonal1 / 2, half],
+        [half, half - diagonal2 / 2],
+      ]
+        .map((p) => p.join(","))
+        .join(" ");
+      return `
+        <svg viewBox="0 0 ${size} ${size}" class="mx-auto" aria-label="Rombo" role="img" tabindex="0">
+          <polygon points="${points}" stroke="magenta" fill="none" stroke-width="3"/>
+        </svg>
+      `;
+    }
+
+    function crearSVGTrianguloEscaleno(lado1, lado2, lado3) {
+      const size = 100;
+      // Calculate triangle points using law of cosines
+      const x1 = 0,
+        y1 = 0;
+      const x2 = lado1,
+        y2 = 0;
+      const cosAngle =
+        (lado1 ** 2 + lado2 ** 2 - lado3 ** 2) / (2 * lado1 * lado2);
+      const sinAngle = Math.sqrt(1 - cosAngle ** 2);
+      const x3 = lado2 * cosAngle;
+      const y3 = lado2 * sinAngle;
+
+      // Center triangle in SVG
+      const cx = (x1 + x2 + x3) / 3;
+      const cy = (y1 + y2 + y3) / 3;
+      const points = [
+        [x1 - cx + size / 2, y1 - cy + size / 2],
+        [x2 - cx + size / 2, y2 - cy + size / 2],
+        [x3 - cx + size / 2, y3 - cy + size / 2],
+      ]
+        .map((p) => p.join(","))
+        .join(" ");
+
+      return `
+        <svg viewBox="0 0 ${size} ${size}" class="mx-auto" aria-label="Triángulo Escaleno" role="img" tabindex="0">
+          <polygon points="${points}" stroke="cyan" fill="none" stroke-width="3"/>
+        </svg>
+      `;
+    }
+
+    function crearSVGTrapecio(baseMayor, baseMenor, lado1, lado2, altura) {
+      const size = 100;
+      const half = size / 2;
+      const s = (baseMayor - baseMenor) / 2;
+      const h = altura;
+      const points = [
+        [half - baseMayor / 2, half + h / 2],
+        [half + baseMayor / 2, half + h / 2],
+        [half + baseMenor / 2, half - h / 2],
+        [half - baseMenor / 2, half - h / 2],
+      ]
+        .map((p) => p.join(","))
+        .join(" ");
+      return `
+        <svg viewBox="0 0 ${size} ${size}" class="mx-auto" aria-label="Trapecio" role="img" tabindex="0">
+          <polygon points="${points}" stroke="yellow" fill="none" stroke-width="3"/>
+        </svg>
+      `;
+    }
+
+    // Render a figura card
+
+    function renderFiguraCard(figura) {
+      let svg = "";
+      let detalles = "";
+      switch (figura.tipo) {
+        case "Cuadrado":
+          svg = crearSVGCuadrado(figura.lado * 10);
+          detalles = `Lado: ${figura.lado.toFixed(2)}`;
+          break;
+        case "Círculo":
+          svg = crearSVGCirculo(figura.radio * 10);
+          detalles = `Radio: ${figura.radio.toFixed(2)}`;
+          break;
+        case "Rectángulo":
+          svg = crearSVGRectangulo(figura.lado1 * 10, figura.lado2 * 10);
+          detalles = `Lados: ${figura.lado1.toFixed(2)} x ${figura.lado2.toFixed(2)}`;
+          break;
+        case "Rombo":
+          svg = crearSVGRombo(figura.diagonal1 * 10, figura.diagonal2 * 10);
+          detalles = `Diagonales: ${figura.diagonal1.toFixed(2)}, ${figura.diagonal2.toFixed(2)}`;
+          break;
+        case "Triángulo Escaleno":
+          svg = crearSVGTrianguloEscaleno(figura.lado1 * 10, figura.lado2 * 10, figura.lado3 * 10);
+          detalles = `Lados: ${figura.lado1.toFixed(2)}, ${figura.lado2.toFixed(2)}, ${figura.lado3.toFixed(2)}`;
+          break;
+        case "Trapecio":
+          svg = crearSVGTrapecio(figura.base_mayor * 10, figura.base_menor * 10, figura.lado1 * 10, figura.lado2 * 10, figura.altura * 10);
+          detalles = `Bases: ${figura.base_mayor.toFixed(2)}, ${figura.base_menor.toFixed(2)}<br>Lados: ${figura.lado1.toFixed(2)}, ${figura.lado2.toFixed(2)}`;
+          break;
+        default:
+          detalles = "Detalles no disponibles";
+      }
+
+      return `
+        <article class="card bg-white rounded shadow p-5 flex flex-col items-center" tabindex="0" aria-label="${figura.tipo}">
+          <div class="w-32 h-32 mb-4">${svg}</div>
+          <h3 class="text-xl font-semibold mb-2">${figura.tipo}</h3>
+          <p class="text-md mb-1">Área: ${figura.calcular_area().toFixed(2)}</p>
+          <p class="text-md mb-3">Perímetro: ${figura.calcular_perimetro().toFixed(2)}</p>
+          <p class="text-sm text-gray-600 text-center">${detalles}</p>
+        </article>
+      `;
+    }
+
+    // Render all figuras
+
+    function renderFiguras() {
+      const container = document.getElementById("figurasContainer");
+      if (figuras.length === 0) {
+        container.innerHTML = `<p class="text-center text-gray-600 text-lg">No hay figuras generadas aún.</p>`;
+        return;
+      }
+      container.innerHTML = figuras.map(renderFiguraCard).join("");
+    }
+
+    // Show message
+
+    function showMessage(text, type = "text-blue-600") {
+      const messageDiv = document.getElementById("message");
+      messageDiv.textContent = text;
+      messageDiv.className = `text-center mb-6 text-lg font-semibold ${type}`;
+      setTimeout(() => {
+        messageDiv.textContent = "";
+        messageDiv.className = "text-center mb-6 text-lg font-semibold text-gray-700";
+      }, 4000);
+    }
+
+    // Event handlers
+
+    document.getElementById("ternaForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const num1 = parseFloat(document.getElementById("num1").value);
+      const num2 = parseFloat(document.getElementById("num2").value);
+      const num3 = parseFloat(document.getElementById("num3").value);
+      try {
+        if (agregarTerna([num1, num2, num3])) {
+          renderFiguras();
+          showMessage("Terna procesada y figuras generadas.", "text-green-600");
+          e.target.reset();
+        } else {
+          showMessage("No se pudieron generar figuras con esta terna.", "text-yellow-600");
+        }
+      } catch (error) {
+        showMessage("Error: " + error.message, "text-red-600");
+      }
+    });
+
+    document.getElementById("sortAreaBtn").addEventListener("click", () => {
+      figuras = bubbleSortIterative(figuras, (f) => f.calcular_area());
+      renderFiguras();
+      showMessage("Figuras ordenadas por área (ascendente).", "text-green-600");
+    });
+
+    document.getElementById("sortPerimeterBtn").addEventListener("click", () => {
+      figuras = bubbleSortRecursive(figuras, (f) => f.calcular_perimetro(), true);
+      renderFiguras();
+      showMessage("Figuras ordenadas por perímetro (descendente).", "text-yellow-600");
+    });
+
+    document.getElementById("searchAreaBtn").addEventListener("click", () => {
+      document.getElementById("searchAreaContainer").classList.remove("hidden");
+      document.getElementById("statsContainer").classList.add("hidden");
+      document.getElementById("message").textContent = "";
+      document.getElementById("searchAreaInput").focus();
+    });
+
+    document.getElementById("cancelSearchBtn").addEventListener("click", () => {
+      document.getElementById("searchAreaContainer").classList.add("hidden");
+      document.getElementById("searchResult").textContent = "";
+    });
+
+    document.getElementById("searchAreaForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const areaBuscar = parseFloat(document.getElementById("searchAreaInput").value);
+      const figurasOrdenadas = bubbleSortIterative(figuras, (f) => f.calcular_area());
+      const areasOrdenadas = figurasOrdenadas.map((f) => f.calcular_area());
+      let izquierda = 0;
+      let derecha = areasOrdenadas.length - 1;
+      let indice = -1;
+      while (izquierda <= derecha) {
+        const medio = Math.floor((izquierda + derecha) / 2);
+        if (Math.abs(areasOrdenadas[medio] - areaBuscar) < 0.001) {
+          indice = medio;
+          break;
+        } else if (areasOrdenadas[medio] < areaBuscar) {
+          izquierda = medio + 1;
+        } else {
+          derecha = medio - 1;
+        }
+      }
+      const resultDiv = document.getElementById("searchResult");
+      if (indice === -1) {
+        resultDiv.textContent = `No se encontró figura con área aproximada a ${areaBuscar.toFixed(2)}.`;
+        resultDiv.className = "text-yellow-600 font-semibold";
+      } else {
+        const figura = figurasOrdenadas[indice];
+        resultDiv.textContent = `Figura encontrada: ${figura.tipo} con área ${figura.calcular_area().toFixed(2)}.`;
+        resultDiv.className = "text-green-600 font-semibold";
+      }
+    });
+
+    document.getElementById("showStatsBtn").addEventListener("click", () => {
+      document.getElementById("searchAreaContainer").classList.add("hidden");
+      const statsContainer = document.getElementById("statsContainer");
+      const statsList = document.getElementById("statsList");
+      statsList.innerHTML = "";
+      if (figuras.length === 0) {
+        showMessage("No hay figuras para mostrar estadísticas.", "text-yellow-600");
+        return;
+      }
+      const totalTernas = ternas.length;
+      const ternasTresIguales = ternas.filter((t) => new Set(t).size === 1).length;
+      const ternasDosIguales = ternas.filter((t) => new Set(t).size === 2).length;
+      const totalFiguras = figuras.length;
+      const tiposFigura = {};
+      figuras.forEach((f) => {
+        tiposFigura[f.tipo] = (tiposFigura[f.tipo] || 0) + 1;
+      });
+      const areas = figuras.map((f) => f.calcular_area());
+      const perimetros = figuras.map((f) => f.calcular_perimetro());
+      const promedioAreas =
+        areas.reduce((a, b) => a + b, 0) / (areas.length || 1);
+      const medianaPerimetros = calcularMediana(perimetros);
+
+      const liTotalTernas = document.createElement("li");
+      liTotalTernas.textContent = `Total de ternas procesadas: ${totalTernas}`;
+      statsList.appendChild(liTotalTernas);
+
+      const liTresIguales = document.createElement("li");
+      liTresIguales.textContent = `Ternas con tres números iguales: ${ternasTresIguales}`;
+      statsList.appendChild(liTresIguales);
+
+      const liDosIguales = document.createElement("li");
+      liDosIguales.textContent = `Ternas con dos números iguales: ${ternasDosIguales}`;
+      statsList.appendChild(liDosIguales);
+
+      const liTresDiferentes = document.createElement("li");
+      liTresDiferentes.textContent = `Ternas con tres números diferentes: ${
+        totalTernas - ternasTresIguales - ternasDosIguales
+      }`;
+      statsList.appendChild(liTresDiferentes);
+
+      const liTotalFiguras = document.createElement("li");
+      liTotalFiguras.textContent = `Total de figuras generadas: ${totalFiguras}`;
+      statsList.appendChild(liTotalFiguras);
+
+      const liTipos = document.createElement("li");
+      liTipos.textContent = "Figuras por tipo:";
+      statsList.appendChild(liTipos);
+
+      const ulTipos = document.createElement("ul");
+      ulTipos.className = "list-disc list-inside ml-5";
+      for (const [tipo, cantidad] of Object.entries(tiposFigura)) {
+        const li = document.createElement("li");
+        li.textContent = `${tipo}: ${cantidad}`;
+        ulTipos.appendChild(li);
+      }
+      statsList.appendChild(ulTipos);
+
+      const liPromedioAreas = document.createElement("li");
+      liPromedioAreas.textContent = `Promedio de áreas: ${promedioAreas.toFixed(2)}`;
+      statsList.appendChild(liPromedioAreas);
+
+      const liMedianaPerimetros = document.createElement("li");
+      liMedianaPerimetros.textContent = `Mediana de perímetros: ${medianaPerimetros.toFixed(
+        2
+      )}`;
+      statsList.appendChild(liMedianaPerimetros);
+
+      statsContainer.classList.remove("hidden");
+      statsContainer.focus();
+    });
+
+    document.getElementById("closeStatsBtn").addEventListener("click", () => {
+      document.getElementById("statsContainer").classList.add("hidden");
+    });
+
+    // Utility: median calculation
+
+    function calcularMediana(arr) {
+      if (arr.length === 0) return 0;
+      const sorted = [...arr].sort((a, b) => a - b);
+      const mid = Math.floor(sorted.length / 2);
+      if (sorted.length % 2 === 0) {
+        return (sorted[mid - 1] + sorted[mid]) / 2;
+      } else {
+        return sorted[mid];
+      }
+    }
+
+    // Initialize with test data
+
+    function init() {
+      const datosPrueba = generarDatosPrueba();
+      datosPrueba.forEach((terna) => {
+        try {
+          agregarTerna(terna);
+        } catch {}
+      });
+      renderFiguras();
+    }
+
+    window.onload = init;
+  </script>
+</body>
+</html>
