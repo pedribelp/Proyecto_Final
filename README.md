@@ -99,6 +99,3 @@ sistema_figuras/
 Si quieres contribuir a este proyecto, por favor abre un "issue" o envía una "pull request". Cualquier tipo de mejora, corrección de errores o sugerencia es bienvenida.
 
 ---
-```
-
-Este README proporciona una visión clara y concisa del proyecto, permitiendo a los usuarios y contribuyentes entender su estructura y funcionamiento.
